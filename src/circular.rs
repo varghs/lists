@@ -23,7 +23,7 @@ impl<T> CircularList<T> {
         todo!();
     }
 
-    pub fn pop(&mut self) -> T {
+    pub fn pop(&mut self) -> Option<T> {
         todo!();
     }
 }
