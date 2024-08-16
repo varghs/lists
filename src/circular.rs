@@ -18,6 +18,14 @@ impl<T> CircularList<T> {
             tail: None,
         }
     }
+
+    pub fn push(&mut self, elem: T) {
+        todo!();
+    }
+
+    pub fn pop(&mut self) -> T {
+        todo!();
+    }
 }
 
 #[cfg(test)]
