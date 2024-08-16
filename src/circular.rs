@@ -2,13 +2,13 @@ use std::rc::{Rc, Weak};
 use std::cell::RefCell;
 
 pub struct CircularList<T> {
-    head: Option<Rc<RefCell<Node<T>>>>,
-    tail: Option<Weak<RefCell<Node<T>>>>,
+    head: Option<Weak<RefCell<Node<T>>>>,
+    tail: Option<Rc<RefCell<Node<T>>>>,
 }
 
 struct Node<T> {
     elem: T,
-    next: Option<Weak<RefCell<Node<T>>>>,
+    next: Option<Rc<RefCell<Node<T>>>>,
 }
 
 impl<T> CircularList<T> {
