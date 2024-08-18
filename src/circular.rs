@@ -3,7 +3,7 @@ use std::cell::RefCell;
 
 pub struct CircularList<T> {
     head: Option<Weak<RefCell<Node<T>>>>,
-    tail: Option<Rc<RefCell<Node<T>>>>,
+    tail: Option<Weak<RefCell<Node<T>>>>,
 }
 
 struct Node<T> {
@@ -20,17 +20,66 @@ impl<T> CircularList<T> {
     }
 
     pub fn push(&mut self, elem: T) {
-        todo!();
+        if self.head.is_none() {
+            let head_node = Rc::new(RefCell::new(Node {
+                elem: elem,
+                next: None,
+            }));
+            head_node.borrow_mut().next = Some(head_node.clone());
+            self.head = Some(Rc::downgrade(&head_node));
+            self.tail = Some(Rc::downgrade(&head_node));
+            drop(head_node);
+        } else {
+            let new_node = Rc::new(RefCell::new(Node {
+                elem: elem,
+                next: self.tail.as_ref().unwrap().upgrade(),
+            }));
+
+            if let Some(head_node) = self.head.as_ref().unwrap().upgrade() {
+                head_node.borrow_mut().next = Some(new_node.clone());
+            }
+            
+            self.tail = Some(Rc::downgrade(&new_node));
+            drop(new_node);
+        }
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        todo!();
+        if self.head.is_none() {
+            None
+        } else if self.head.as_ref().unwrap().ptr_eq(&self.tail.as_ref().unwrap()) {
+            todo!("Gotta handle this case.")
+        } else {
+            if let Some(head_node) = self.head.as_ref().unwrap().upgrade() {
+                self.tail.take().map(|weak_ref| {
+                    let upgraded = weak_ref.upgrade().unwrap();
+                    head_node.borrow_mut().next = upgraded.borrow().next.clone();
+                    if let Ok(r) = Rc::try_unwrap(upgraded) {
+                        let node = r.into_inner();
+                        self.tail = Some(Rc::downgrade(&node.next.unwrap()));
+
+                        node.elem
+                    } else {
+                        panic!("Something went wrong 2");
+                    }
+                })
+            } else {
+                panic!("Something went wrong 3")
+            }
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::CircularList;
+
+    #[test]
+    fn add_one() {
+        let mut l = CircularList::new();
+        l.push(1);
+        assert_eq!(Some(1), l.pop());
+    }
 
     #[test]
     fn add_stuff() {
