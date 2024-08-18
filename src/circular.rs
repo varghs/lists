@@ -48,7 +48,18 @@ impl<T> CircularList<T> {
         if self.head.is_none() {
             None
         } else if self.head.as_ref().unwrap().ptr_eq(&self.tail.as_ref().unwrap()) {
-            todo!("Gotta handle this case.")
+            if let Some(head_node) = self.head.take().unwrap().upgrade() {
+                self.tail = None;
+                head_node.borrow_mut().next = None;
+                if let Ok(r) = Rc::try_unwrap(head_node) {
+                    let node = r.into_inner();
+                    return Some(node.elem);
+                } else {
+                    panic!("Something went wrong 0.");
+                }
+            } else {
+                panic!("Something went wrong 1.")
+            }
         } else {
             if let Some(head_node) = self.head.as_ref().unwrap().upgrade() {
                 self.tail.take().map(|weak_ref| {
