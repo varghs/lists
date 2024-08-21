@@ -79,6 +79,14 @@ impl<T> CircularList<T> {
             }
         }
     }
+
+    // I don't think peek or peek_mut are possible.
+}
+
+impl<T> Drop for CircularList<T> {
+    fn drop(&mut self) {
+        while self.pop().is_some() {}
+    }
 }
 
 #[cfg(test)]
@@ -100,5 +108,18 @@ mod tests {
         assert_eq!(Some(3), l.pop());
         assert_eq!(Some(2), l.pop());
         assert_eq!(Some(1), l.pop());
+        assert_eq!(None, l.pop());
+    }
+
+    #[test]
+    fn pop_none() {
+        let mut l: CircularList<i32> = CircularList::new();
+        assert_eq!(None, l.pop());
+    }
+
+    #[test]
+    fn test_drop() {
+        let mut l: CircularList<i32> = CircularList::new();
+        l.push(1); l.push(2); l.push(3);
     }
 }
