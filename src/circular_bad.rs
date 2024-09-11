@@ -1,3 +1,7 @@
+/*
+Leaving this here for posterity, it's just not good.
+*/
+
 use std::rc::{Rc, Weak};
 use std::cell::RefCell;
 
@@ -79,8 +83,6 @@ impl<T> CircularList<T> {
             }
         }
     }
-
-    // I don't think peek or peek_mut are possible.
 }
 
 impl<T> Drop for CircularList<T> {
